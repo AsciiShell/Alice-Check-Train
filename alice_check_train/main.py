@@ -4,6 +4,7 @@ import os
 import traceback
 
 from alice_check_train.rasp_api import get_rasp, filter_rasp, RaspException
+from alice_check_train.true_answer import rasp_to_text
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -15,24 +16,6 @@ def get_config():
     station_to = os.getenv('STATION_TO')
     date = datetime.date.today().strftime('%Y-%m-%d')
     return key, station_from, station_to, date
-
-
-def _second_to_minutes_seconds(s):
-    s = int(s)
-    return s // 60, s % 60
-
-
-def rasp_to_text(data) -> str:
-    if len(data) == 0:
-        return 'Нет ближайших поездов в ближайший час'
-    result = 'Ближайший поезд отправляется через {} минут {} секунд.\n'.format(
-        *_second_to_minutes_seconds(data[0]['diff'].total_seconds())
-    )
-    for row in data[1:]:
-        result += 'Затем через {} минут.\n'.format(
-            _second_to_minutes_seconds(row['diff'].total_seconds())[0]
-        )
-    return result
 
 
 def main_handler(event, context):

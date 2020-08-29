@@ -12,7 +12,8 @@ def main():
 
     js = get_rasp(key, station_from, station_to, date)
     filtered = filter_rasp(js['segments'], 60)
-    print(rasp_to_text(filtered))
+    message = rasp_to_text(filtered)
+    print(message)
 
 
 if __name__ == '__main__':
