@@ -3,10 +3,18 @@ import logging
 import os
 import traceback
 
-from rasp_api import get_rasp, filter_rasp, RaspException
+from alice_check_train.rasp_api import get_rasp, filter_rasp, RaspException
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+def get_config():
+    key = os.getenv('RASP_KEY')
+    station_from = os.getenv('STATION_FROM')
+    station_to = os.getenv('STATION_TO')
+    date = datetime.date.today().strftime('%Y-%m-%d')
+    return key, station_from, station_to, date
 
 
 def _second_to_minutes_seconds(s):
@@ -51,10 +59,7 @@ def main_handler(event, context):
 
 
 def check_intent(req, key):
-    try:
-        return req['request']['nlu']['intents'][key]
-    except KeyError:
-        return None
+    return req.get('request', {}).get('nlu', {}).get('intents', {}).get(key)
 
 
 def handler(event: dict, context: dict):
@@ -69,11 +74,7 @@ def handler(event: dict, context: dict):
         response['response']['text'] = 'Привет! Я могу проверить расписание электричек'
         return response
 
-    key = os.getenv('RASP_KEY')
-    station_from = os.getenv('STATION_FROM')
-    station_to = os.getenv('STATION_TO')
-
-    date = datetime.date.today().strftime('%Y-%m-%d')
+    key, station_from, station_to, date = get_config()
     js = get_rasp(key, station_from, station_to, date)
     filtered = filter_rasp(js['segments'], 60)
     response['response']['text'] = rasp_to_text(filtered)

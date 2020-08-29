@@ -1,6 +1,5 @@
 import datetime
 import json
-import os
 
 import requests
 
@@ -31,13 +30,3 @@ def filter_rasp(data: dict, max_diff: int, ignore_express=True):
             row['diff'] = departure - now
             result.append(row)
     return result
-
-
-if __name__ == '__main__':
-    key = os.getenv('RASP_KEY')
-    station_from = os.getenv('STATION_FROM')
-    station_to = os.getenv('STATION_TO')
-    date = os.getenv('DATE')
-    js = get_rasp(key, station_from, station_to, date)
-    js1 = filter_rasp(js['segments'], 60)
-    pass
