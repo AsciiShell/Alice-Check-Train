@@ -12,7 +12,7 @@ def main():
     date = datetime.date.today().strftime('%Y-%m-%d')
 
     js = get_rasp(key, station_from, station_to, date)
-    filtered = filter_rasp(js['segments'], 60)
+    filtered = filter_rasp(js['segments'], 300)
     message = rasp_to_text(filtered)
     print(message)
 

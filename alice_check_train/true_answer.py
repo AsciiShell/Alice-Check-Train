@@ -94,17 +94,17 @@ def build_message_hours(noun):
     if not noun_h:
         return build_message_minutes(noun, False)
     if 10 < noun_h < 20:
-        return 'через ' + word_return(noun_h) + ' часов' + \
+        return 'через ' + str(noun_h) + ' часов ' + \
                build_message_minutes(noun % 60, True)
     s = noun_h % 10
     if s == 1:
-        return 'через ' + word_return(noun_h) + ' час' + \
+        return 'через ' + str(noun_h) + ' час ' + \
                build_message_minutes(noun % 60, True)
     if 1 < s < 5:
-        return 'через ' + word_return(noun_h) + ' часа' + \
+        return 'через ' + str(noun_h) + ' часа ' + \
                build_message_minutes(noun % 60, True)
     if s > 4 or s == 0:
-        return 'через ' + word_return(noun_h) + ' часов' + \
+        return 'через ' + str(noun_h) + ' часов ' + \
                build_message_minutes(noun % 60, True)
 
 
@@ -112,25 +112,25 @@ def rasp_to_text(data) -> str:
     pretext = ['Затем', 'Далее', 'Вскоре после него', 'Следом', 'Потом',
                'Еще один']
     if len(data) == 0:
-        return 'Нет отправлений в ближайший час'
+        return 'Нет отправлений в ближайший час.'
     else:
         result = ''
         if (int(data[0]['diff'].total_seconds()) // 60) > 60:
-            result = 'Ближайший поезд отправляется {}\n'.format(
+            result = 'Ближайший поезд отправляется {}.\n'.format(
                 build_message_hours(int(data[0]['diff'].total_seconds()) // 60)
             )
         else:
-            result = 'Ближайший поезд отправляется {}\n'.format(
+            result = 'Ближайший поезд отправляется {}.\n'.format(
                 build_message_hours(
                     int(data[0]['diff'].total_seconds()) // 60)
             )
     for row in data[1:]:
         if (int(row['diff'].total_seconds()) // 60) > 60:
-            result += '{} {}\n'.format(random.choice(pretext),
-                                       build_message_hours(int(
-                                           row['diff'].total_seconds()) // 60))
+            result += '{} {}.\n'.format(random.choice(pretext),
+                                        build_message_hours(int(
+                                            row['diff'].total_seconds()) // 60))
         else:
-            result += '{} {}\n'.format(random.choice(pretext),
-                                       build_message_hours(int(
-                                           row['diff'].total_seconds()) // 60))
+            result += '{} {}.\n'.format(random.choice(pretext),
+                                        build_message_hours(int(
+                                            row['diff'].total_seconds()) // 60))
     return result
