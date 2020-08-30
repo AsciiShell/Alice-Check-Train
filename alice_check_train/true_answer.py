@@ -5,28 +5,17 @@ class InvalidNumberException(Exception):
     pass
 
 
+nouns_to_str = {0: '', 1: 'одну', 2: 'две', 3: 'три', 4: 'четыре', 5: 'пять',
+                6: 'шесть', 7: 'семь', 8: 'восемь', 9: 'девять', 10: 'десять',
+                11: 'одинадцать', 12: 'двенадцать', 13: 'тринадцать',
+                14: 'четырнадцать', 15: 'пятнадцать', 16: 'шестнадцать',
+                17: 'семнадцать', 18: 'восемнадцать', 19: 'девятнадцать'}
+
+
 # pylint: disable=R0911,R0912
 def first_req(noun):
-    if noun == 0:
-        return ''
-    if noun == 1:
-        return 'одну'
-    if noun == 2:
-        return 'две'
-    if noun == 3:
-        return 'три'
-    if noun == 4:
-        return 'четыре'
-    if noun == 5:
-        return 'пять'
-    if noun == 6:
-        return 'шесть'
-    if noun == 7:
-        return 'семь'
-    if noun == 8:
-        return 'восемь'
-    if noun == 9:
-        return 'девять'
+    if 0 <= noun <= 9:
+        return nouns_to_str[noun]
     raise InvalidNumberException(
         'wrong number is entered: {}'.format(noun))
 
@@ -36,28 +25,7 @@ def word_return(noun):
     if noun < 10:
         return first_req(noun)
     if 9 < noun < 20:
-        if noun == 10:
-            return 'десять'
-        if noun == 11:
-            return 'одинадцать'
-        if noun == 12:
-            return 'двенадцать'
-        if noun == 13:
-            return 'тринадцать'
-        if noun == 14:
-            return 'четырнадцать'
-        if noun == 15:
-            return 'пятнадцать'
-        if noun == 16:
-            return 'шестнадцать'
-        if noun == 17:
-            return 'семнадцать'
-        if noun == 18:
-            return 'восемнадцать'
-        if noun == 19:
-            return 'девятнадцать'
-        if noun == 20:
-            return 'двадцать'
+        return nouns_to_str[noun]
     if 19 < noun < 30:
         return 'двадцать ' + first_req(noun % 10)
     if 29 < noun < 40:
@@ -77,7 +45,7 @@ def build_message_minutes(noun, hours):
     # для корректной речи алисы
     if noun == 0:
         if hours:
-            return
+            return ''
         return 'прямо сейчас'
     if not hours:
         pretext = 'через '
