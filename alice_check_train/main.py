@@ -32,7 +32,7 @@ def main_handler(event, context):
         response['response']['text'] = 'Ошибка подключения к Яндекс.Расписанию. Попробуйте позже'
         logger.warning('Ya rasp:\r%s\rRequest:\r%s\rResponse:\r%s\r', repr(traceback.format_exc()), repr(event),
                        repr(response))
-    except Exception as e:
+    except Exception:  # pylint: disable=broad-except
         response['response']['text'] = 'Неизвестная ошибка'
         logger.error('Handler error:\r%s\rRequest:\r%s\rResponse:\r%s\r', repr(traceback.format_exc()), repr(event),
                      repr(response))
@@ -45,6 +45,7 @@ def check_intent(req, key):
     return req.get('request', {}).get('nlu', {}).get('intents', {}).get(key)
 
 
+# pylint: disable=W0613
 def handler(event: dict, context: dict):
     response = {
         'version': event['version'],

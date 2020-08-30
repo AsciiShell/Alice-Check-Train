@@ -5,6 +5,7 @@ class InvalidNumberException(Exception):
     pass
 
 
+# pylint: disable=R0911,R0912
 def first_req(noun):
     if noun == 0:
         return ''
@@ -30,6 +31,7 @@ def first_req(noun):
         'wrong number is entered: {}'.format(noun))
 
 
+# pylint: disable=R0911,R0912
 def word_return(noun):
     if noun < 10:
         return first_req(noun)
@@ -113,17 +115,15 @@ def rasp_to_text(data) -> str:
                'Еще один']
     if len(data) == 0:
         return 'Нет отправлений в ближайший час.'
+    if (int(data[0]['diff'].total_seconds()) // 60) > 60:
+        result = 'Ближайший поезд отправляется {}.\n'.format(
+            build_message_hours(int(data[0]['diff'].total_seconds()) // 60)
+        )
     else:
-        result = ''
-        if (int(data[0]['diff'].total_seconds()) // 60) > 60:
-            result = 'Ближайший поезд отправляется {}.\n'.format(
-                build_message_hours(int(data[0]['diff'].total_seconds()) // 60)
-            )
-        else:
-            result = 'Ближайший поезд отправляется {}.\n'.format(
-                build_message_hours(
-                    int(data[0]['diff'].total_seconds()) // 60)
-            )
+        result = 'Ближайший поезд отправляется {}.\n'.format(
+            build_message_hours(
+                int(data[0]['diff'].total_seconds()) // 60)
+        )
     for row in data[1:]:
         if (int(row['diff'].total_seconds()) // 60) > 60:
             result += '{} {}.\n'.format(random.choice(pretext),
