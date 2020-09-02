@@ -57,7 +57,8 @@ def handler(event: dict, context: dict):
     if check_intent(event, 'YANDEX.HELP') or check_intent(event, 'YANDEX.WHAT_CAN_YOU_DO'):
         response['response']['text'] = 'Привет! Я могу проверить расписание электричек'
         return response
-
+    if event['session'].get('new'):
+        response['response']['end_session'] = 'true'
     key, station_from, station_to, date = get_config()
     js = get_rasp(key, station_from, station_to, date)
     filtered = filter_rasp(js['segments'], 300)
