@@ -1,6 +1,6 @@
 import pytest
 
-from alice_check_train.true_answer import first_req
+from alice_check_train.true_answer import _NUMBERS_TO_STR
 
 
 @pytest.mark.parametrize("test_input,expected", [
@@ -9,4 +9,4 @@ from alice_check_train.true_answer import first_req
     (9, 'девять')
 ])
 def test_answer(test_input, expected):
-    assert first_req(test_input) == expected
+    assert _NUMBERS_TO_STR[test_input] == expected

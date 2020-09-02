@@ -60,6 +60,6 @@ def handler(event: dict, context: dict):
 
     key, station_from, station_to, date = get_config()
     js = get_rasp(key, station_from, station_to, date)
-    filtered = filter_rasp(js['segments'], 60)
+    filtered = filter_rasp(js['segments'], 300)
     response['response']['text'] = rasp_to_text(filtered)
     return response

@@ -5,100 +5,61 @@ class InvalidNumberException(Exception):
     pass
 
 
-nouns_to_str = {0: '', 1: 'одну', 2: 'две', 3: 'три', 4: 'четыре', 5: 'пять',
-                6: 'шесть', 7: 'семь', 8: 'восемь', 9: 'девять', 10: 'десять',
-                11: 'одинадцать', 12: 'двенадцать', 13: 'тринадцать',
-                14: 'четырнадцать', 15: 'пятнадцать', 16: 'шестнадцать',
-                17: 'семнадцать', 18: 'восемнадцать', 19: 'девятнадцать'}
+_NUMBERS_TO_STR = {0: '', 1: 'одну', 2: 'две', 3: 'три', 4: 'четыре', 5: 'пять', 6: 'шесть', 7: 'семь', 8: 'восемь',
+                   9: 'девять', 10: 'десять', 11: 'одиннадцать', 12: 'двенадцать', 13: 'тринадцать', 14: 'четырнадцать',
+                   15: 'пятнадцать', 16: 'шестнадцать', 17: 'семнадцать', 18: 'восемнадцать', 19: 'девятнадцать'}
 
 
-# pylint: disable=R0911,R0912
-def first_req(noun):
-    if 0 <= noun <= 9:
-        return nouns_to_str[noun]
-    raise InvalidNumberException(
-        'wrong number is entered: {}'.format(noun))
+def number_to_string(number):
+    if number < 20:
+        return _NUMBERS_TO_STR[number]
+    digit = _NUMBERS_TO_STR[number % 10]
+    if 19 < number < 30:
+        return 'двадцать ' + digit
+    if 29 < number < 40:
+        return 'тридцать ' + digit
+    if 39 < number < 50:
+        return 'сорок ' + digit
+    if 49 < number < 60:
+        return 'пятьдесят ' + digit
+    raise InvalidNumberException('the number must be lower than 60, your number is: {}'.format(number))
 
 
-# pylint: disable=R0911,R0912
-def word_return(noun):
-    if noun < 10:
-        return first_req(noun)
-    if 9 < noun < 20:
-        return nouns_to_str[noun]
-    if 19 < noun < 30:
-        return 'двадцать ' + first_req(noun % 10)
-    if 29 < noun < 40:
-        return 'тридцать ' + first_req(noun % 10)
-    if 39 < noun < 50:
-        return 'сорок ' + first_req(noun % 10)
-    if 49 < noun < 60:
-        return 'пятьдесят ' + first_req(noun % 10)
-    raise InvalidNumberException(
-        'the number must be lower than 60, your number is: {}'.format(noun))
-
-
-def build_message_minutes(noun, hours):
-    s = noun % 10
-    pretext = ''
-    # если поезд отправляется < чем через час, то pretext = через,
-    # для корректной речи алисы
-    if noun == 0:
-        if hours:
-            return ''
+def build_message_minutes(minutes: int, use_hours: bool):
+    digit = minutes % 10
+    if minutes == 0:
+        if use_hours:
+            return ''  # 180 -> Через 3 часа
         return 'прямо сейчас'
-    if not hours:
-        pretext = 'через '
-    if 10 < noun < 20:
-        return pretext + word_return(noun) + ' минут'
-    if s == 1:
-        return pretext + word_return(noun) + ' минуту'
-    if 1 < s < 5:
-        return pretext + word_return(noun) + ' минуты'
-    if s > 4 or s == 0:
-        return pretext + word_return(noun) + ' минут'
+    if 10 < minutes < 20 or digit == 0 or digit > 4:
+        minutes_word = 'минут'
+    elif digit == 1:
+        minutes_word = 'минуту'
+    else:  # 1 < digit < 5:
+        minutes_word = 'минуты'
+    return '{} {} {}'.format('' if use_hours else 'через', number_to_string(minutes), minutes_word)
 
 
-def build_message_hours(noun):
-    noun_h = noun // 60
-    if not noun_h:
-        return build_message_minutes(noun, False)
-    if 10 < noun_h < 20:
-        return 'через ' + str(noun_h) + ' часов ' + \
-               build_message_minutes(noun % 60, True)
-    s = noun_h % 10
-    if s == 1:
-        return 'через ' + str(noun_h) + ' час ' + \
-               build_message_minutes(noun % 60, True)
-    if 1 < s < 5:
-        return 'через ' + str(noun_h) + ' часа ' + \
-               build_message_minutes(noun % 60, True)
-    if s > 4 or s == 0:
-        return 'через ' + str(noun_h) + ' часов ' + \
-               build_message_minutes(noun % 60, True)
+def build_message_hours(minutes):
+    hours = minutes // 60
+    hours_digit = hours % 10
+    if hours == 0:
+        return build_message_minutes(minutes, False)
+    if 10 < hours < 20 or hours_digit == 0 or hours_digit > 4:
+        hours_word = 'часов'
+    elif hours_digit == 1:
+        hours_word = 'час'
+    else:  # 1 < hours_digit < 5:
+        hours_word = 'часа'
+    return 'через {} {} {}'.format(str(hours), hours_word, build_message_minutes(minutes % 60, True))
 
 
-def rasp_to_text(data) -> str:
-    pretext = ['Затем', 'Далее', 'Вскоре после него', 'Следом', 'Потом',
-               'Еще один']
+def rasp_to_text(data, max_rows=3) -> str:
+    pretext = ['Затем', 'Далее', 'Вскоре после него', 'Следом', 'Потом', 'Еще один']
+    random.shuffle(pretext)
     if len(data) == 0:
         return 'Нет отправлений в ближайший час.'
-    if (int(data[0]['diff'].total_seconds()) // 60) > 60:
-        result = 'Ближайший поезд отправляется {}.\n'.format(
-            build_message_hours(int(data[0]['diff'].total_seconds()) // 60)
-        )
-    else:
-        result = 'Ближайший поезд отправляется {}.\n'.format(
-            build_message_hours(
-                int(data[0]['diff'].total_seconds()) // 60)
-        )
-    for row in data[1:]:
-        if (int(row['diff'].total_seconds()) // 60) > 60:
-            result += '{} {}.\n'.format(random.choice(pretext),
-                                        build_message_hours(int(
-                                            row['diff'].total_seconds()) // 60))
-        else:
-            result += '{} {}.\n'.format(random.choice(pretext),
-                                        build_message_hours(int(
-                                            row['diff'].total_seconds()) // 60))
+    result = 'Ближайший поезд отправляется {}.\n'.format(build_message_hours(data[0]['diff_minutes']))
+    for text, row in zip(pretext, data[1:max_rows]):
+        result += '{} {}.\n'.format(text, build_message_hours(row['diff_minutes']))
     return result
