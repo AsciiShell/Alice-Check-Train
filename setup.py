@@ -20,7 +20,7 @@ with open('README.md', 'rt') as f:
 
 setup(
     name=module_name,
-    version='0.1.1',
+    version='0.1.2',
     description='Alice skill for checking nearest trains',
     long_description=long_description,
     long_description_content_type='text/markdown',

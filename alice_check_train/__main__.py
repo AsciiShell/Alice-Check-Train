@@ -13,7 +13,9 @@ def main():
 
     js = get_rasp(key, station_from, station_to, date)
     filtered = filter_rasp(js['segments'], 300)
-    message = rasp_to_text(filtered)
+    message = rasp_to_text(filtered, 1000)
+    if len(message) > 1024:
+        print('Too long message: {} > 1024'.format(len(message)))
     print(message)
 
 

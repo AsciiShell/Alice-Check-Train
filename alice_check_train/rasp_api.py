@@ -28,5 +28,6 @@ def filter_rasp(data: dict, max_diff: int, ignore_express=True):
         now = datetime.datetime.now(departure.tzinfo)
         if now < departure < now + max_diff:
             row['diff'] = departure - now
+            row['diff_minutes'] = int(row['diff'].total_seconds()) // 60
             result.append(row)
     return result
